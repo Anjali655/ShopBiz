@@ -1,20 +1,48 @@
 import React, { useState } from "react";
-import { Form, Button, Modal, Input, InputNumber, Upload } from "antd";
+import { Form, Button, Modal, Input, InputNumber, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { createProductReducer } from "../../../redux/action/action";
+import { createProduct } from "../../../redux/action/action";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
 
 function AddProductModal() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { product } = useSelector((state) => state.createProductReducer);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [file, setFile] = useState(null);
+
+
+  const [modalData, setModalData] = useState({
+    name: "",
+    price: "",
+    description: "",
+    rating: "",
+    quantity: "",
+    image: "",
+  });
+
+
 
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
+
+  const handleOk = (e) => {
+    e.preventDefault();
+
+    if (!modalData.image) {
+      console.log("no image selected");
+      return;
+    }
+
+    dispatch(createProduct(modalData));
+
+    console.log("modalData =>", modalData);
+
     setIsModalOpen(false);
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -30,7 +58,8 @@ function AddProductModal() {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form autoComplete="off" onFinish={(values) => console.log({ values })}>
+        <Form name="myForm" autoComplete="off" onFinish="">
+          {/* Form Group */}
           <Form.Item
             name="name"
             label="Name"
@@ -42,46 +71,60 @@ function AddProductModal() {
             ]}
             hasFeedback
           >
-            <Input placeholder="Name" />
+            <Input
+              name="name"
+              placeholder="Name"
+              style={{ display: "flex", flexDirection: "row" }}
+              value={modalData.name}
+              onChange={(e) => {
+                setModalData({ ...modalData, name: e.target.value });
+              }}
+            />
           </Form.Item>
 
           <Form.Item
-            name="upload"
-            label="Upload"
-            valuePropName="fileList"
-            getValueFromEvent=""
-          >
-            <Upload name="logo" action="/upload.do" listType="picture">
-              <Button icon={<UploadOutlined />}>Click to upload</Button>
-            </Upload>
-          </Form.Item>
-
-          <Form.Item
-            name="price"
-            label="Price"
+            name="description"
+            label="Description"
             rules={[
               {
                 required: true,
-                message: "Please enter price of the product",
+                message: "Please enter description of product",
               },
             ]}
             hasFeedback
           >
-            <Input placeholder="Price" />
+            <Input
+              name="description"
+              placeholder="Description"
+              value={modalData.description}
+              style={{ display: "flex", flexDirection: "row" }}
+              onChange={(e) =>
+                setModalData({ ...modalData, description: e.target.value })
+              }
+            />
           </Form.Item>
 
-          <Form.Item label="Quantity">
+          <Form.Item label="Price" name="price">
             <Form.Item
-              name="input-number"
+              name="price"
               rules={[
                 {
                   required: true,
-                  message: "Please enter quantity of product",
+                  message: "Please enter price of product",
                 },
               ]}
               noStyle
             >
-              <InputNumber min={1} max={10} />
+              <InputNumber
+                min={1}
+                name="price"
+                placeholder="Price"
+                style={{ display: "flex", flexDirection: "column" }}
+                value={modalData.price}
+                // onChange={(value) => console.log("price =>", value)}
+                onChange={(e) => setModalData({ ...modalData, price: e })}
+                // onChange={(z) => console.log("price", z)}
+              />
             </Form.Item>
             <span
               className="ant-form-text"
@@ -91,6 +134,82 @@ function AddProductModal() {
             ></span>
           </Form.Item>
 
+          <Form.Item
+            name="rating"
+            label="Rating"
+            rules={[
+              {
+                required: true,
+                message: "Please rate the product",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input
+              name="rating"
+              placeholder="Rate the product"
+              style={{ display: "flex", flexDirection: "row" }}
+              value={modalData.rating}
+              onChange={(e) => {
+                setModalData({ ...modalData, rating: e.target.value });
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item label="Quantity">
+            <Form.Item
+              name="quantity"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter quantity of product",
+                },
+              ]}
+              noStyle
+            >
+              <InputNumber
+                min={1}
+                max={10}
+                name="quantity"
+                placeholder="Please enter quantity of product"
+                value={modalData.quantity}
+                // onChange={(e) => console.log("quantity",e.target)}
+                onChange={(value) =>
+                  setModalData({ ...modalData, quantity: value })
+                }
+              />
+            </Form.Item>
+            <span
+              className="ant-form-text"
+              style={{
+                marginLeft: 8,
+              }}
+            ></span>
+          </Form.Item>
+
+          <Form.Item
+            name="image"
+            label="Image"
+            rules={[
+              {
+                required: true,
+                message: "please upload product image",
+              },
+            ]}
+          >
+            <Input
+              type="file"
+              name="image"
+              onChange={(e) =>
+                setModalData({
+                  ...modalData,
+                  // image: URL.createObjectURL(e.target.files[0]),
+                  image: e.target.files[0],
+                })
+              }
+            />
+            <img src={file} />
+          </Form.Item>
           {/* <Form.Item wrapperCol={{ span: 24 }}>
             <Button block type="primary" htmlType="submit">
               Add Product

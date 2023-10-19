@@ -4,6 +4,10 @@ import axios from 'axios';
 // Next we make an 'instance' of it
 const instance  = axios.create({
   baseURL: 'http://localhost:3100/api', 
+  headers:{
+    Authorization:`Bearer ${localStorage.getItem('token')}`,
+    'Content-Type': 'multipart/form-data'
+  }
 });
 
 // Where you would set stuff like your 'Authorization' header, etc ...

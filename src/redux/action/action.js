@@ -8,7 +8,10 @@ import {
     SIGNIN_FAILURE,
     POST_PRODUCT_REQUEST,
     POST_PRODUCT_SUCCESS,
-    POST_PRODUCT_FAILURE
+    POST_PRODUCT_FAILURE,
+    GET_PRODUCTS_REQUEST,
+    GET_PRODUCTS_SUCCESS,
+    GET_PRODUCTS_FAILURE
 } from '../constants';
 
 
@@ -75,12 +78,22 @@ const signin = (userData) => {
     }
 }
 
-const createProduct = (ProductData) => {
+const createProduct = (modalData) => {
     return async (dispatch) => {
         dispatch({ type: POST_PRODUCT_REQUEST })
         try {
-            const res = await axiosConfig.post("/products/create", ProductData)
-            console.log('createProduct', res.data)
+            let formData = new FormData();
+            formData.append("name", modalData.name);
+            formData.append("price", modalData.price);
+            formData.append("description", modalData.description);
+            formData.append("rating", modalData.rating);
+            formData.append("quantity", modalData.quantity);
+            formData.append("image", modalData.image);
+
+            console.log('modalData=----------', modalData)
+
+            const res = await axiosConfig.post("/products/create", formData)
+            console.log('createProduct', formData)
 
             dispatch({
                 type: POST_PRODUCT_SUCCESS,
@@ -90,7 +103,7 @@ const createProduct = (ProductData) => {
                     message: "Product created successfully"
                 }
             })
-
+            alert(res.data.message);
         } catch (error) {
             console.log("error", error);
             dispatch({
@@ -105,5 +118,36 @@ const createProduct = (ProductData) => {
     }
 }
 
-export { signup, signin, createProduct }
+const getProductsList = (params) => {
+    return async (dispatch) => {
+        dispatch({ type: GET_PRODUCTS_REQUEST })
+        try {
+            // /products/lists?page=${1}&limit=${6}&search=${""}
+            const res = await axiosConfig.get(`/products/lists?${params}`);
+            console.log("Product list returned =>", res.data);
+
+            dispatch({
+                type: GET_PRODUCTS_SUCCESS,
+                payload: {
+                    ...res.data,
+                    updateStatus: "success",
+                    message: "Product list updated successfully",
+                }
+            })
+            console.log("Product list updated successfully")
+        } catch (error) {
+            console.log("error", error);
+            dispatch({
+                type: GET_PRODUCTS_FAILURE,
+                payload: {
+                    updateStatus: "error",
+                    message: "Product list failed to update successfully"
+                }
+            })
+        }
+    }
+}
+
+
+export { signup, signin, createProduct, getProductsList }
 // signup and signin actions take user data as a parameter and make POST requests to /signup and /signin endpoints

@@ -4,7 +4,7 @@ import {
     POST_PRODUCT_FAILURE
 } from "../../constants";
 
-const initialState = { product: {}, loading: false, error: null }
+const initialState = { productsList: {}, loading: false, error: null }
 
 const createProductReducer = (state = initialState, action) => {
     switch (action.type) {

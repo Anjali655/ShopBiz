@@ -4,6 +4,7 @@ import { signup } from "../../../redux/action/action";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 
+
 function Signup() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.authReducer);
@@ -14,6 +15,7 @@ function Signup() {
     name: "",
     phone: "",
   });
+  
   // console.log("formData", formData);
 
   // useEffect(() => {
