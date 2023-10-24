@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import aspectRatio from "@tailwindcss/aspect-ratio";
 import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
+import { Button, Modal, Space } from "antd";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { getProductsList, setCartData } from "../../../redux/action/action";
+import { useDispatch, useSelector } from "react-redux";
 import { FaCartArrowDown } from "react-icons/fa";
 import {
   ChevronDownIcon,
@@ -22,12 +25,6 @@ const sortOptions = [
   { name: "Price: High to Low", href: "#", current: false },
 ];
 
-//   { name: "Totes", href: "#" },
-//   { name: "Backpacks", href: "#" },
-//   { name: "Travel Bags", href: "#" },
-//   { name: "Hip Bags", href: "#" },
-//   { name: "Laptop Sleeves", href: "#" },
-// ];
 const filters = [
   {
     id: "color",
@@ -115,6 +112,69 @@ const products = [
 ];
 
 function Products() {
+  const dispatch = useDispatch();
+  const [search, setSearch] = useState("");
+
+  const productsList = useSelector((state) =>
+    state.getProductListReducer.data ? state.getProductListReducer.data : []
+  );
+
+  console.log("productsList =>", productsList);
+
+  const cart = useSelector((state) =>
+    state.cartReducer.cart ? state.cartReducer.cart : []
+  );
+
+  const pagenumber = useSelector((state) =>
+    state.getProductListReducer.pagenumber
+      ? state.getProductListReducer.pagenumber
+      : 1
+  );
+
+  const limit = useSelector((state) =>
+    state.getProductListReducer.limit ? state.getProductListReducer.limit : 9
+  );
+
+  let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
+
+  // Pushing the product in Cart
+  const handleCart = (products) => {
+    console.log("handleCart", products);
+
+    var index = cart.findIndex((x) => x.productsdata._id === products._id);
+    console.log("index----- ", index);
+
+    let updatedCart = [...cart]
+
+    if (index === -1) {
+      let cartObj = {
+        productsdata: products,
+        quantity: 1,
+        price:products.price,
+        totalprice: products.price * products.quantity,
+      };
+      // console.log("productsssssssssss=>",typeof(products.price),typeof(products.quantity));
+      // console.log("multiply" , products.price * products.quantity);
+      // console.log("updatedCart",updatedCart);
+      cart.push(cartObj)
+      dispatch(setCartData("cart", cart));
+    } else {
+      updatedCart = [...cart]
+      // updatedCart[index].quantity += 1;
+      // updatedCart[index].totalprice = cart[index].price * cart[index].quantity;
+
+      console.log("updatedCart----",updatedCart);
+      // quantity: quantity + 1;
+      // totalprice: products.price * quantity;
+      dispatch(setCartData("cart", updatedCart));
+    }
+   
+  };
+
+  useEffect(() => {
+    dispatch(getProductsList(param));
+  }, []);
+
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   return (
     <div className="bg-white">
@@ -418,39 +478,51 @@ function Products() {
                     </h2> */}
 
                     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-                      {products.map((product) => (
-                        <div key={product.id} className="group relative">
-                          <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
-                            <img
-                              src={product.imageSrc}
-                              alt={product.imageAlt}
-                              className="h-full w-full object-cover object-center lg:h-full lg:w-full"
-                            />
-                          </div>
-                          <div className="mt-4 flex justify-between">
-                            <div>
-                              <h3 className="text-sm text-gray-700">
-                                <a href={product.href}>
-                                  <span
-                                    aria-hidden="true"
-                                    className="absolute inset-0"
-                                  />
-                                  {product.name}
-                                </a>
-                              </h3>
-                              <p className="mt-1 text-sm text-gray-500">
-                                {product.color}
-                              </p>
+                      {productsList.map((product) => {
+                        return (
+                          <div key={product.id} className="group relative">
+                            <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+                              <img
+                                src={product.image}
+                                // alt={product.imageAlt}
+                                className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                              />
                             </div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {product.price}
-                            </p>
-                            <button className="px-4 py-2 transition ease-in duration-200 uppercase rounded-full hover:bg-gray-800 hover:text-white border-2 border-gray-900 focus:outline-none">
-                              <FaCartArrowDown size="20" />
-                            </button>
+                            <div className="mt-4 flex justify-between">
+                              <div>
+                                <h3 className="text-sm text-gray-700">
+                                  <a href={product.href}>
+                                    <span
+                                      aria-hidden="true"
+                                      className="absolute inset-0"
+                                    />
+                                    {product.name}
+                                  </a>
+                                </h3>
+                                <p className="mt-1 text-sm text-gray-500">
+                                  {product.color}
+                                </p>
+                              </div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {product.price}
+                              </p>
+                              <Button
+                                onClick={() => {
+                                  handleCart(product);
+                                }}
+                                className="px-4 py-2 transition ease-in duration-200 uppercase rounded-full hover:bg-gray-800 hover:text-white border-2 border-gray-900 focus:outline-none"
+                              >
+                                <FaCartArrowDown
+                                  // onClick={() => {
+                                  //   alert(product.name);
+                                  // }}
+                                  size="20"
+                                />
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

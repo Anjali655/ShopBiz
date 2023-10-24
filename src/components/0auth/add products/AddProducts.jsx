@@ -1,26 +1,103 @@
 import React, { useState, useEffect } from "react";
 import { EditTwoTone, DeleteTwoTone } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
+import UpdateProductDetailsModal from "../updateProductDetailsModal";
 import { Button, Modal } from "antd";
 import AddProductModal from "../addProductModal";
+import DeleteProductModal from "../deleteProductModal";
 import { getProductsList } from "../../../redux/action/action";
+import { setProductData } from "../../../redux/action/action";
+import {
+  setUpdateProductData,
+  setCreateProductData,
+} from "../../../redux/action/action";
 import { useDispatch, useSelector } from "react-redux";
 
 function AddProducts() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [pageNo, setPageNo] = useState(1);
-  const [limit, setLimit] = useState(1);
+  // const [pageNo, setPageNo] = useState(1);
+  // const [limit, setLimit] = useState(4);
   const [search, setSearch] = useState("");
+
+
   const productsList = useSelector((state) =>
     state.getProductListReducer.data ? state.getProductListReducer.data : []
   );
-  console.log("productsList =>", productsList);
+
+  const pagenumber = useSelector((state) =>
+  state.getProductListReducer.pagenumber ? state.getProductListReducer.pagenumber :1
+);
+
+const limit = useSelector((state) =>
+state.getProductListReducer.limit ? state.getProductListReducer.limit :4
+);
+
+let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
+  // console.log("productsList =>", productsList);
+
+  const status = useSelector((state) => state.createProductReducer.status);
+
+  const deletedProduct = useSelector(
+    (state) => state.deleteProductReducer.status
+  );
+
+  const updateProduct = useSelector(
+    (state) => state.updateProductReducer.status
+  );
+
+  // console.log("deleteProductReducer =>", deletedProduct);
 
   useEffect(() => {
-    let param = `page=${pageNo}&limit=${limit}&search=${search}`;
+    if (status) {
+      dispatch(getProductsList(param));
+      dispatch(setCreateProductData("status", false));
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (updateProduct) {
+      console.log("-------------hhhhhhhhhhhhh---Product list-------------");
+      dispatch(getProductsList(param));
+      dispatch(setUpdateProductData("status", false));
+      dispatch(setUpdateProductData("productData", ''));
+    }
+  }, [updateProduct]);
+
+  useEffect(() => {
     dispatch(getProductsList(param));
   }, []);
+
+  // handling deleteProduct
+  const handleDeleteProduct = (id) => {
+    console.log("delete product", id);
+    dispatch(setProductData("modal", true));
+    dispatch(setProductData("product_id", id));
+    dispatch(getProductsList(param));
+  };
+
+  // handling updateProduct
+  const handleUpdateProduct = (productData) => {
+    setTimeout(()=>{
+    console.log("handleUpdateProduct-------------", productData);
+    dispatch(setUpdateProductData("modal", true));
+    dispatch(setUpdateProductData("productData", productData));
+    // dispatch(getProductsList(param));
+  },500)
+  };
+
+  // Pagination
+  const handlePrevBtn = () => {
+    console.log("handlePrevBtn");
+    let param = `page=${Number(pagenumber) - 1}&limit=${limit}&search=${search}`;
+    dispatch(getProductsList(param))
+  };
+
+  const handleNextBtn = () => {
+    console.log("handleNextBtn");
+    let param = `page=${Number(pagenumber) + 1}&limit=${limit}&search=${search}`;
+    dispatch(getProductsList(param))
+  };
 
   return (
     <>
@@ -170,9 +247,9 @@ function AddProducts() {
 
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {productsList.map((product) => {
+                      // console.log("Product: " + product);
                       return (
-                        <tr>
-
+                        <tr key={product._id}>
                           <td className="h-px w-px whitespace-nowrap">
                             <div className="pl-6 py-3">
                               <label
@@ -192,23 +269,96 @@ function AddProducts() {
                           <td className="h-px w-px whitespace-nowrap">
                             <div className="pl-6 lg:pl-3 xl:pl-0 pr-6 py-3">
                               <div className="flex items-center gap-x-3">
-                                <div className="grow">
-                                  <span className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
-                                    {product.image}
-                                  </span>
-                                </div>
+                                <img
+                                  className="inline-block h-[2.375rem] w-[2.375rem] rounded-full ml-5"
+                                  src={product.image}
+                                  alt="Image Description"
+                                />
                               </div>
                             </div>
                           </td>
+
                           <td className="h-px w-px whitespace-nowrap">
                             <div className="pl-6 lg:pl-3 xl:pl-0 pr-6 py-3">
                               <div className="flex items-center gap-x-3">
                                 <div className="grow">
                                   <span className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
-                                    {product.price}
+                                    {product.name}
                                   </span>
                                 </div>
                               </div>
+                            </div>
+                          </td>
+
+                          <td className="h-px w-px whitespace-nowrap">
+                            <div className="pl-6 lg:pl-3 xl:pl-0 pr-6 py-3">
+                              <div className="flex items-center gap-x-3">
+                                <div className="grow">
+                                  <span className="block text-sm text-gray-500">
+                                    {product.description}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="h-px w-72 whitespace-nowrap">
+                            <div className="flex justify-end px-7 py-3">
+                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                {product.price}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="h-px w-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <span className="inline-flex items-center gap-1.5 py-3 px-3 ml-4 rounded-full text-xs font-medium">
+                                {product.quantity}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="h-px w-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <span className="inline-flex items-center gap-1.5 py-3 px-3 ml-4 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                {product.rating}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="h-px w-px whitespace-nowrap">
+                            <div className="px-6 py-1.5">
+                              <a
+                                className="inline-flex items-center ml-2 gap-x-1.5 text-sm text-blue-600 decoration-2 hover:underline font-medium"
+                                href="#"
+                              >
+                                {/* <span className="inline-flex items-center gap-1.5 py-3 px-3 ml-4 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                  <button onClick={() => console.log("productMe",product)}>{product.name}</button>
+                                </span> */}
+                                <EditTwoTone
+                                  onClick={() => {
+                                    handleUpdateProduct(product);
+                                  }}
+                                />
+
+                                <UpdateProductDetailsModal />
+                              </a>
+                            </div>
+                          </td>
+
+                          <td className="h-px w-px whitespace-nowrap">
+                            <div className="px-6 py-1.5">
+                              <a
+                                className="inline-flex items-center ml-5 gap-x-1.5 text-sm text-blue-600 decoration-2 hover:underline font-medium"
+                                href="#"
+                              >
+                                <DeleteTwoTone
+                                  onClick={() => {
+                                    handleDeleteProduct(product._id);
+                                  }}
+                                />
+                                <DeleteProductModal />
+                              </a>
                             </div>
                           </td>
                         </tr>
@@ -222,7 +372,7 @@ function AddProducts() {
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       <span className="font-semibold text-gray-800 dark:text-gray-200">
-                        6
+                        4
                       </span>{" "}
                       results
                     </p>
@@ -231,6 +381,7 @@ function AddProducts() {
                     <div className="inline-flex gap-x-2">
                       <button
                         type="button"
+                        onClick={() => handlePrevBtn()}
                         className="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800"
                       >
                         <svg
@@ -250,6 +401,7 @@ function AddProducts() {
                       </button>
                       <button
                         type="button"
+                        onClick={() => handleNextBtn()}
                         className="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800"
                       >
                         Next
@@ -278,6 +430,7 @@ function AddProducts() {
         {/* End Card */}
       </div>
       {/* End Table Section */}
+      {/* <UpdateProductDetailsModal show={true}/> */}
     </>
   );
 }

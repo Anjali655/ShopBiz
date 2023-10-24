@@ -37,10 +37,9 @@ function Signup() {
     //   phone: "fgdgdfg",
     // }
     dispatch(signup(formData));
-    navigate("/signin")
-
-    // Signup successful
-    // console.log("Signup successful!");
+    if(formData.updateStatus == "success"){
+      navigate("/signin")
+    }
   };
 
   // const onFinish = async (values) => {

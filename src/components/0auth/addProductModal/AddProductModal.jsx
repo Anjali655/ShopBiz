@@ -1,17 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Modal, Input, InputNumber, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { createProduct } from "../../../redux/action/action";
+import { createProduct,getProductsList } from "../../../redux/action/action";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
+
 
 function AddProductModal() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [pageNo, setPageNo] = useState(1);
+  const [limit, setLimit] = useState(4);
+  const [search, setSearch] = useState("");
   const { product } = useSelector((state) => state.createProductReducer);
+ 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [file, setFile] = useState(null);
 
+  let param = `page=${pageNo}&limit=${limit}&search=${search}`;
 
   const [modalData, setModalData] = useState({
     name: "",
@@ -21,7 +27,6 @@ function AddProductModal() {
     quantity: "",
     image: "",
   });
-
 
 
   const showModal = () => {
@@ -37,6 +42,7 @@ function AddProductModal() {
     }
 
     dispatch(createProduct(modalData));
+    dispatch(getProductsList(param))
 
     console.log("modalData =>", modalData);
 
@@ -210,11 +216,6 @@ function AddProductModal() {
             />
             <img src={file} />
           </Form.Item>
-          {/* <Form.Item wrapperCol={{ span: 24 }}>
-            <Button block type="primary" htmlType="submit">
-              Add Product
-            </Button>
-          </Form.Item> */}
         </Form>
       </Modal>
     </>

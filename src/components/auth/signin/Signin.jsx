@@ -3,6 +3,7 @@ import { Form, Button, Input } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import { signin } from "../../../redux/action/action";
 import { useDispatch, useSelector } from "react-redux";
+import Modall from "./Modall";
 
 function Signin() {
   const dispatch = useDispatch();
@@ -13,6 +14,11 @@ function Signin() {
     password: "",
   });
 
+  console.log("formData", formData)
+  const [isModal,setisModal]=React.useState(false)
+
+  console.log("updateStatus",updateStatus)
+  console.log("message", message)
   // useEffect(() => {
   //   console.log("signin-check ------", updateStatus);
   //   if (updateStatus==="success") {
@@ -27,7 +33,10 @@ function Signin() {
 
   const handleSignin = () => {
     dispatch(signin(formData));
-    navigate("/dashboard")
+    // console.log("formData name",formData.name)
+    if(updateStatus == "success"){
+      navigate("/dashboard")
+    }
   };
 
   const handleInputChange = (e) => {
@@ -39,6 +48,7 @@ function Signin() {
   // console.log("=====catch", updateStatus,message);
   return (
     <div>
+      <button onClick={()=>setisModal(true)}>Hello modal</button>
       <main className="w-full max-w-md mx-auto p-6">
         <div className="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
           <div className="p-4 sm:p-7">
@@ -163,6 +173,9 @@ function Signin() {
           </div>
         </div>
       </main>
+      {isModal&&(
+        <Modall isModal={isModal} setisModal={setisModal}/>
+      )}
     </div>
   );
 }
