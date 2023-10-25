@@ -1,5 +1,4 @@
 import * as React from "react";
-import ReactDOM from "react-dom/client";
 import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
 import Signup from '../components/auth/signup';
 import Signin from '../components/auth/signin';
@@ -11,13 +10,11 @@ import AddProducts from "../components/0auth/add products";
 import AddProductModal from "../components/0auth/addProductModal";
 import DeleteProductModal from "../components/0auth/deleteProductModal";
 import UpdateProductDetailsModal from "../components/0auth/updateProductDetailsModal";
-import Sidebar from "../common/sidebar";
-import Header from "../common/header";
-import Footer from "../common/footer";
 import ProtectedRoutes from "./ProtectedRoutes";
-import App from "../App";
+import CustomLayout from "../components/CustomLayout";
 
-// const router = createBrowserRouter([
+
+
 //     {
 //         path: "/signup",
 //         element: <Signup />,
@@ -97,26 +94,22 @@ const router = createBrowserRouter(
             <Route path="/signin" element={<Signin />} />,
             <Route path="/signup" element={<Signup />} />,
             
-            <Route path="/" element={<ProtectedRoutes/>}>
 
-                <Route path="/dashboard" element={<Dashboard />} />,
-                <Route path="/cart" element={<CartPage />} />,
-                <Route path="/addproducts" element={<AddProducts />} />,
-                <Route path="/checkout" element={<Checkout />} />,
-                <Route path="/addproductmodal" element={<AddProductModal />} />,
-                <Route path="/deleteproductmodal" element={<DeleteProductModal />} />,
-                <Route path="/updateproductdetailsmodal" element={<UpdateProductDetailsModal />} />,
-                <Route path="/cart" element={<CartPage />} />,
-
-                <Route path="/" element={<App />}/>,
-
-                {/* <Route path="" element={<App />}>
-                    <Route path="/addform" element={<AddForm />} />,
-                    <Route path="/addproduct" element={<AddProduct />} />
-                    <Route path="/" element={<Product />} />.
-                </Route> */}
+            <Route path="/" element={<ProtectedRoutes />}>
+                <Route path="/" element={<CustomLayout />}>
+               
+                    <Route path="/dashboard" element={<Dashboard />} />,
+                    <Route path="/cart" element={<CartPage />} />,
+                    <Route path="/addproducts" element={<AddProducts />} />,
+                    <Route path="/checkout" element={<Checkout />} />,
+                    <Route path="/addproductmodal" element={<AddProductModal />} />,
+                    <Route path="/deleteproductmodal" element={<DeleteProductModal />} />,
+                    <Route path="/updateproductdetailsmodal" element={<UpdateProductDetailsModal />} />,
+                    <Route path="/cart" element={<CartPage />} />,
+                    {/* <Route path="*" element={<Error />} />, */}
+                </Route>
             </Route>
-        </>,
+        </>
     ])
 )
 

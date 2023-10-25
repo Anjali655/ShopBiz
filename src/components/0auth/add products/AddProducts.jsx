@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { EditTwoTone, DeleteTwoTone } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
 import UpdateProductDetailsModal from "../updateProductDetailsModal";
-import { Button, Modal } from "antd";
+import { Button, Modal,Form } from "antd";
 import AddProductModal from "../addProductModal";
 import DeleteProductModal from "../deleteProductModal";
 import { getProductsList } from "../../../redux/action/action";
@@ -19,22 +19,25 @@ function AddProducts() {
   // const [pageNo, setPageNo] = useState(1);
   // const [limit, setLimit] = useState(4);
   const [search, setSearch] = useState("");
-
+  
+console.log("search=>",search);
 
   const productsList = useSelector((state) =>
     state.getProductListReducer.data ? state.getProductListReducer.data : []
   );
+  console.log("productsList =>", productsList);
 
   const pagenumber = useSelector((state) =>
-  state.getProductListReducer.pagenumber ? state.getProductListReducer.pagenumber :1
-);
+    state.getProductListReducer.pagenumber
+      ? state.getProductListReducer.pagenumber
+      : 1
+  );
 
-const limit = useSelector((state) =>
-state.getProductListReducer.limit ? state.getProductListReducer.limit :4
-);
+  const limit = useSelector((state) =>
+    state.getProductListReducer.limit ? state.getProductListReducer.limit : 4
+  );
 
-let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
-  // console.log("productsList =>", productsList);
+  let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
 
   const status = useSelector((state) => state.createProductReducer.status);
 
@@ -50,7 +53,7 @@ let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
 
   useEffect(() => {
     if (status) {
-      dispatch(getProductsList(param));
+      // dispatch(getProductsList(param));
       dispatch(setCreateProductData("status", false));
     }
   }, [status]);
@@ -60,13 +63,13 @@ let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
       console.log("-------------hhhhhhhhhhhhh---Product list-------------");
       dispatch(getProductsList(param));
       dispatch(setUpdateProductData("status", false));
-      dispatch(setUpdateProductData("productData", ''));
+      dispatch(setUpdateProductData("productData", ""));
     }
   }, [updateProduct]);
 
   useEffect(() => {
     dispatch(getProductsList(param));
-  }, []);
+  }, [search]);
 
   // handling deleteProduct
   const handleDeleteProduct = (id) => {
@@ -78,25 +81,29 @@ let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
 
   // handling updateProduct
   const handleUpdateProduct = (productData) => {
-    setTimeout(()=>{
-    console.log("handleUpdateProduct-------------", productData);
-    dispatch(setUpdateProductData("modal", true));
-    dispatch(setUpdateProductData("productData", productData));
-    // dispatch(getProductsList(param));
-  },500)
+    setTimeout(() => {
+      console.log("handleUpdateProduct-------------", productData);
+      dispatch(setUpdateProductData("modal", true));
+      dispatch(setUpdateProductData("productData", productData));
+      // dispatch(getProductsList(param));
+    }, 500);
   };
 
   // Pagination
   const handlePrevBtn = () => {
     console.log("handlePrevBtn");
-    let param = `page=${Number(pagenumber) - 1}&limit=${limit}&search=${search}`;
-    dispatch(getProductsList(param))
+    let param = `page=${
+      Number(pagenumber) - 1
+    }&limit=${limit}&search=${search}`;
+    dispatch(getProductsList(param));
   };
 
   const handleNextBtn = () => {
     console.log("handleNextBtn");
-    let param = `page=${Number(pagenumber) + 1}&limit=${limit}&search=${search}`;
-    dispatch(getProductsList(param))
+    let param = `page=${
+      Number(pagenumber) + 1
+    }&limit=${limit}&search=${search}`;
+    dispatch(getProductsList(param));
   };
 
   return (
@@ -111,6 +118,13 @@ let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
                 {/* Header */}
                 <div className="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-gray-700">
                   <div>
+                    <button
+                      onClick={() => navigate("/dashboard")}
+                      className="px-2 py-1 rounded hover:bg-blue-100"
+                      style={{ border: "1px solid #2563EB", color: "black" }}
+                    >
+                      {`< Back`}
+                    </button>
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                       Products
                     </h2>
@@ -119,6 +133,54 @@ let param = `page=${pagenumber}&limit=${limit}&search=${search}`;
                     </p>
                   </div>
                   <div>
+
+                    
+                    <div className="inline-flex gap-x-2 mr-20">
+                      <Form autocomplete="off">
+                        <label
+                          htmlFor="default-search"
+                          className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+                        >
+                          Search
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg
+                              className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                              />
+                            </svg>
+                          </div>
+                          <input
+                            type="search"
+                            onChange={(e) => setSearch(e.target.value)}
+                            id="default-search"
+                            className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Search Product.."
+                            required=""
+                          />
+                          {/* <button
+                            type="submit"
+                            onClick={() => console.log("Default Search")}
+                            className="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                          >
+                            Search
+                          </button> */}
+                        </div>
+                      </Form>
+                    </div>
+
+
                     <div className="inline-flex gap-x-2">
                       <a
                         className="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800"

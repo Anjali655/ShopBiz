@@ -8,5 +8,5 @@ import logger from "redux-logger";
 import { applyMiddleware, createStore } from 'redux';
 
 const store = createStore(rootReducer, applyMiddleware(logger, thunk));
-
+// console.log('store', store);
 export default store;

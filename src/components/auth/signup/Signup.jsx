@@ -7,7 +7,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 function Signup() {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.authReducer);
+  const  user  = useSelector((state) => state.authReducer);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -16,7 +16,7 @@ function Signup() {
     phone: "",
   });
   
-  // console.log("formData", formData);
+  console.log("user", user.updateStatus);
 
   // useEffect(() => {
   //   console.log('signup-check------', user.checkSignup)
@@ -37,7 +37,8 @@ function Signup() {
     //   phone: "fgdgdfg",
     // }
     dispatch(signup(formData));
-    if(formData.updateStatus == "success"){
+    console.log("formData",formData);
+    if(user.updateStatus == "success"){
       navigate("/signin")
     }
   };

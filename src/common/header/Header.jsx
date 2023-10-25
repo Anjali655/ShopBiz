@@ -1,6 +1,9 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { useNavigate, Link } from "react-router-dom";
+import { setCartData} from "../../redux/action/action";
+import {useDispatch, useSelector} from "react-redux";
+
 import {
   Bars3Icon,
   ShoppingCartIcon,
@@ -31,9 +34,14 @@ function classNames(...classes) {
 }
 
 function Header({ children }) {
+  const Navigate = useNavigate();
+  
+  const cartCount = useSelector((state) => state.cartReducer);
+  // console.log("cartCount",cartCount.cart.length);
+
   return (
     <>
-      <div className="min-h-full">
+      <div className="... sticky top-0 min-h-full">
         <Disclosure as="nav" className="bg-gray-800">
           {({ open }) => (
             <>
@@ -83,7 +91,7 @@ function Header({ children }) {
                         </button>
                       </Link>
                       <span className="inline-flex items-center rounded-md mb-6 -ml-0.1 bg-pink-50 px-2 py-1 text-xs font-medium text-pink-700 ring-1 ring-inset ring-pink-700/10">
-                        3
+                        {cartCount.cart.length}
                       </span>
 
                       {/* Profile dropdown */}
@@ -110,7 +118,14 @@ function Header({ children }) {
                         >
                           <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             {userNavigation.map((item) => (
-                              <Menu.Item key={item.name}>
+                              <Menu.Item key={item.name}
+                              onClick={() => {
+                                if(item.name === "Sign out"){
+                                  localStorage.removeItem("token");
+                                  Navigate("/signin");
+                                }
+                              }}
+                              >
                                 {({ active }) => (
                                   <a
                                     href={item.href}

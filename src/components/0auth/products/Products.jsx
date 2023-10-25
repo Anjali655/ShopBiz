@@ -167,6 +167,7 @@ function Products() {
       // quantity: quantity + 1;
       // totalprice: products.price * quantity;
       dispatch(setCartData("cart", updatedCart));
+      // alert("Item added to Cart successfully")
     }
    
   };

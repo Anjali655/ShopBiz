@@ -107,7 +107,7 @@ const UpdateProductDetailsModal = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <p>Name : {productData ? productData.name : "productData"}</p>
+        {/* <p>Name : {productData ? productData.name : "productData"}</p> */}
         <Form name="myForm" autoComplete="off" onFinish="">
           {/* Form Group */}
           <Form.Item

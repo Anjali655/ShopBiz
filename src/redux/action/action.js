@@ -28,7 +28,6 @@ export function setProductData(name, value) {
         type: DELETE_PRODUCT_SUCCESS,
         payload: { [name]: value },
     };
-
 }
 
 export function setCreateProductData(name, value) {
@@ -98,7 +97,7 @@ const signup = (userData) => {
     }
 }
 
-const signin = (userData) => {
+const signin = (userData,navigate) => {
     return async (dispatch) => {
         dispatch({ type: SIGNIN_REQUEST });
 
@@ -115,10 +114,10 @@ const signin = (userData) => {
                     updateStatus: "success",
                     message: "Sign in successfully"
                 }
+                
             });
-
-
-
+            console.log("Dashboard mein pohonch gya")
+            navigate("/dashboard");
         } catch (error) {
             // console.log('catch error------------', error.response.data.message, error.response.data.status)
             dispatch({
